@@ -1,1 +1,68 @@
 @import "tailwindcss";
+
+@theme {
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+  --color-accent-purple: #8b5cf6;
+  --color-accent-pink: #ec4899;
+  --color-accent-cyan: #06b6d4;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+}
+
+@utility glass {
+  background-color: color-mix(in srgb, white 60%, transparent);
+  backdrop-filter: blur(24px);
+  border: 1px solid color-mix(in srgb, white 20%, transparent);
+}
+@utility glass-card {
+  @apply glass;
+  background-color: color-mix(in srgb, white 70%, transparent);
+  border: 1px solid color-mix(in srgb, white 30%, transparent);
+  box-shadow: 0 10px 40px -10px rgba(59,130,246,0.05);
+}
+@utility gradient-text {
+  background: linear-gradient(to right, var(--color-primary-600), var(--color-accent-purple), var(--color-accent-pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@utility gradient-bg {
+  background: linear-gradient(to bottom right, var(--color-primary-600), var(--color-accent-purple), var(--color-accent-pink));
+}
+@utility btn-primary {
+  @apply gradient-bg text-white px-8 py-3.5 rounded-2xl font-semibold shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40 transition-all duration-300 hover:scale-105 active:scale-95;
+}
+@utility btn-secondary {
+  background-color: color-mix(in srgb, white 80%, transparent);
+  color: #374151;
+  @apply dark:bg-gray-800/80 dark:text-gray-200 px-8 py-3.5 rounded-2xl font-semibold border border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-600 hover:shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-105 active:scale-95;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-10px) rotate(2deg); }
+  66% { transform: translateY(5px) rotate(-1deg); }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.6); }
+}
+
+.dark { color-scheme: dark; }
+
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-float-delayed { animation: float 6s ease-in-out infinite; animation-delay: -3s; }
+.animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }

@@ -1,0 +1,14 @@
+venv311
+train
+test
+.ipynb_checkpoints
+*.ipynb
+__pycache__
+*.h5
+*.keras
+*.pkl
+*.csv
+*.zip
+*.tar
+*.pt
+*.ckpt
