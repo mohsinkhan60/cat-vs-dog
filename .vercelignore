@@ -6,7 +6,6 @@ test
 __pycache__
 *.h5
 *.keras
-*.pkl
 *.csv
 *.zip
 *.tar
