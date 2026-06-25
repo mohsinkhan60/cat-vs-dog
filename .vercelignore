@@ -12,3 +12,5 @@ __pycache__
 *.tar
 *.pt
 *.ckpt
+backend/train
+backend/test

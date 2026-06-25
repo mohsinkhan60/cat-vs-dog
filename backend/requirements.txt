@@ -9,4 +9,3 @@ flask-cors
 numpy
 pillow
 gunicorn
-tensorflow-cpu
