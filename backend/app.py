@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, jsonify
 import pickle
 import numpy as np
@@ -7,9 +8,14 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-# Load model
-with open("model.pkl", "rb") as file:
-    model = pickle.load(file)
+MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "model.pkl")
+
+try:
+    with open(MODEL_PATH, "rb") as file:
+        model = pickle.load(file)
+except Exception as e:
+    print(f"Failed to load model: {e}")
+    model = None
 
 
 @app.route("/")
@@ -19,8 +25,12 @@ def home():
 @app.route("/predict", methods=["POST"])
 def predict():
 
-    try:
+    if model is None:
+        return jsonify({
+            "error": "Model not loaded"
+        }), 500
 
+    try:
         file = request.files["image"]
 
         img = Image.open(file)
