@@ -13,8 +13,9 @@ MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "model.pkl
 try:
     with open(MODEL_PATH, "rb") as file:
         model = pickle.load(file)
+    print(f"Model loaded successfully from: {MODEL_PATH}")
 except Exception as e:
-    print(f"Failed to load model: {e}")
+    print(f"Failed to load model from {MODEL_PATH}: {e}")
     model = None
 
 
