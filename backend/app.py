@@ -1,12 +1,10 @@
 import os
-from flask import Flask, request, jsonify
-import pickle
 import numpy as np
-from PIL import Image
+from flask import Flask, request, jsonify
 from flask_cors import CORS
+from PIL import Image
 
 app = Flask(__name__)
-# CORS(app, origins=["https://cat-vs-dog-prediction.vercel.app", "http://localhost:5000", "http://localhost:5173"])
 CORS(app, resources={
     r"/*": {
         "origins": [
@@ -20,17 +18,24 @@ CORS(app, resources={
     }
 })
 
+MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "model.tflite")
 
-
-MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "model.pkl")
+interpreter = None
+input_details = None
+output_details = None
 
 try:
-    with open(MODEL_PATH, "rb") as file:
-        model = pickle.load(file)
+    try:
+        import tflite_runtime.interpreter as tflite
+    except ImportError:
+        from tensorflow import lite as tflite
+    interpreter = tflite.Interpreter(model_path=MODEL_PATH)
+    interpreter.allocate_tensors()
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
     print(f"Model loaded successfully from: {MODEL_PATH}")
 except Exception as e:
     print(f"Failed to load model from {MODEL_PATH}: {e}")
-    model = None
 
 
 @app.route("/")
@@ -39,37 +44,21 @@ def home():
 
 @app.route("/predict", methods=["POST"])
 def predict():
-
-    if model is None:
-        return jsonify({
-            "error": "Model not loaded"
-        }), 500
+    if interpreter is None:
+        return jsonify({"error": "Model not loaded"}), 500
 
     try:
         file = request.files["image"]
-
         img = Image.open(file)
-
-        # RGB
         img = img.convert("RGB")
-
-        # match training size
         img = img.resize((256, 256))
-
-        # convert to array
-        img = np.array(img)
-
-        # normalize
+        img = np.array(img, dtype=np.float32)
         img = img / 255.0
-
-        # add batch dimension
         img = np.expand_dims(img, axis=0)
 
-        print(img.shape)
-
-        prediction = model.predict(img)
-
-        print(prediction)
+        interpreter.set_tensor(input_details[0]['index'], img)
+        interpreter.invoke()
+        prediction = interpreter.get_tensor(output_details[0]['index'])
 
         result = "Dog" if prediction[0][0] > 0.5 else "Cat"
 
@@ -79,9 +68,7 @@ def predict():
         })
 
     except Exception as e:
-        return jsonify({
-            "error": str(e)
-        }), 500
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
