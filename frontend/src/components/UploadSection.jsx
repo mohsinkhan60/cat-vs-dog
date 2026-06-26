@@ -119,7 +119,7 @@ export default function UploadSection() {
                 type="file"
                 accept="image/*"
                 onChange={handleInputChange}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 aria-label="Upload image file"
               />
               <motion.div
