@@ -26,10 +26,13 @@ output_details = None
 
 try:
     try:
-        import tflite_runtime.interpreter as tflite
+        from ai_edge_litert.interpreter import Interpreter as TFLInterpreter
     except ImportError:
-        from tensorflow import lite as tflite
-    interpreter = tflite.Interpreter(model_path=MODEL_PATH)
+        try:
+            from tflite_runtime.interpreter import Interpreter as TFLInterpreter
+        except ImportError:
+            from tensorflow.lite.python.interpreter import Interpreter as TFLInterpreter
+    interpreter = TFLInterpreter(model_path=MODEL_PATH)
     interpreter.allocate_tensors()
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
