@@ -6,7 +6,21 @@ from PIL import Image
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app, origins=["https://cat-vs-dog-prediction.vercel.app", "http://localhost:5000", "http://localhost:5173"])
+# CORS(app, origins=["https://cat-vs-dog-prediction.vercel.app", "http://localhost:5000", "http://localhost:5173"])
+CORS(app, resources={
+    r"/*": {
+        "origins": [
+            "https://cat-vs-dog-prediction.vercel.app",
+            "http://localhost:5173",
+            "http://localhost:3000"
+        ],
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True
+    }
+})
+
+
 
 MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "model.pkl")
 
