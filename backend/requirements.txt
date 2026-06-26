@@ -4,8 +4,16 @@
 # opencv-python>=4.8.0
 # matplotlib>=3.7.0
 
-flask
-flask-cors
-numpy
-pillow
-gunicorn
+# flask
+# flask-cors
+# numpy
+# pillow
+# gunicorn
+
+Flask==3.1.0
+flask-cors==6.0.1
+numpy==2.3.1
+Pillow==11.3.0
+scikit-learn==1.7.1
+tensorflow==2.19.0
+gunicorn==23.0.0
