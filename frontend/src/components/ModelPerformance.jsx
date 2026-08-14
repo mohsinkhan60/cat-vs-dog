@@ -1,84 +1,134 @@
 import { motion } from 'framer-motion';
 
 const metrics = [
-  { label: 'Accuracy', value: 95, suffix: '%', description: 'On test dataset' },
-  { label: 'Precision', value: 94, suffix: '%', description: 'Cat classification' },
-  { label: 'Recall', value: 96, suffix: '%', description: 'Dog classification' },
-  { label: 'Training Images', value: 25, suffix: 'K+', description: 'Balanced dataset' },
+  { label: 'Validation Accuracy', value: 77, suffix: '%', description: 'On 25,000-image dataset' },
+  { label: 'Model Parameters', value: 431, suffix: 'K', description: '431,553 total params' },
+  { label: 'TFLite Model Size', value: 1.65, suffix: 'MB', description: 'Optimized for cloud deployment' },
+  { label: 'End-to-End Latency', value: 200, suffix: 'ms', description: 'Max response time on Vercel' },
+];
+
+const archStats = [
+  { label: 'CNN Layers', value: '4' },
+  { label: 'Feature Maps', value: '32→256' },
+  { label: 'Epochs Trained', value: '25' },
+  { label: 'Input Resolution', value: '256×256' },
 ];
 
 export default function ModelPerformance() {
   return (
-    <section id="performance" className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-50/30 dark:via-cyan-900/10 to-transparent" />
-      <div className="max-w-5xl mx-auto relative">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+    <section
+      id="performance"
+      style={{
+        backgroundColor: 'var(--color-soft-cloud)',
+        paddingTop: 'var(--spacing-section)',
+        paddingBottom: 'var(--spacing-section)',
+      }}
+    >
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
+        {/* Section header */}
+        <div
+          className="hairline-bottom"
+          style={{ paddingBottom: '24px', marginBottom: '0' }}
         >
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            <span className="gradient-text">Model Performance</span>
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
-            Our model achieves state-of-the-art accuracy on the challenging Cats vs Dogs dataset.
+          <p className="caption-md" style={{ color: 'var(--color-mute)', marginBottom: '6px' }}>
+            Metrics
           </p>
-        </motion.div>
+          <h2 className="heading-xl" style={{ color: 'var(--color-ink)' }}>
+            Model Performance
+          </h2>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Metrics row — 4 columns on desktop, 2 on mobile */}
+        <div className="grid grid-cols-2 lg:grid-cols-4" style={{ borderTop: '1px solid var(--color-hairline)' }}>
           {metrics.map((metric, index) => (
             <motion.div
               key={metric.label}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.5, delay: index * 0.15 }}
-              whileHover={{ y: -8, transition: { duration: 0.3 } }}
-              className="glass-card rounded-2xl p-6 text-center group"
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.5, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                backgroundColor: 'var(--color-canvas)',
+                padding: 'clamp(20px, 3vw, 32px)',
+                borderRight: [0, 1, 2].includes(index) ? '1px solid var(--color-hairline)' : 'none',
+                borderBottom: index < 2 ? '1px solid var(--color-hairline)' : 'none',
+              }}
             >
-              <div className="text-4xl font-bold gradient-text mb-2">
+              {/* Big number */}
+              <p
+                className="display-campaign"
+                style={{
+                  color: 'var(--color-ink)',
+                  fontSize: 'clamp(36px, 4vw, 56px)',
+                  marginBottom: '4px',
+                }}
+              >
                 {metric.value}{metric.suffix}
-              </div>
-              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+              </p>
+
+              <p className="body-strong" style={{ color: 'var(--color-ink)', marginBottom: '4px' }}>
                 {metric.label}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+              <p className="caption-md" style={{ color: 'var(--color-mute)', marginBottom: '20px' }}>
                 {metric.description}
               </p>
-              <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+
+              {/* Flat hairline progress bar — capped at 100 for visual */}
+              <div className="confidence-bar-bg">
                 <motion.div
+                  className="confidence-bar-fill"
                   initial={{ width: 0 }}
-                  whileInView={{ width: `${metric.value}%` }}
+                  whileInView={{ width: `${Math.min(metric.value, 100)}%` }}
                   viewport={{ once: true }}
-                  transition={{ duration: 1.2, delay: 0.3 + index * 0.15, ease: 'easeOut' }}
-                  className="h-full gradient-bg rounded-full"
+                  transition={{ duration: 1.1, delay: 0.3 + index * 0.1, ease: [0.22, 1, 0.36, 1] }}
                 />
               </div>
             </motion.div>
           ))}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-12 glass-card rounded-2xl p-6 sm:p-8"
+        {/* Architecture overview row */}
+        <div
+          style={{
+            backgroundColor: 'var(--color-canvas)',
+            borderTop: '1px solid var(--color-hairline)',
+          }}
         >
-          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4 text-center">
-            Training Dataset Overview
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-            {['Total Images', 'Cat Images', 'Dog Images', 'Epochs Trained'].map((label, i) => (
-              <div key={label} className="p-4">
-                <p className="text-2xl font-bold gradient-text">{[25000, 12500, 12500, 25][i]}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{label}</p>
-              </div>
+          <div
+            style={{
+              padding: 'clamp(14px, 2vw, 20px) clamp(16px, 3vw, 32px)',
+              borderBottom: '1px solid var(--color-hairline)',
+            }}
+          >
+            <p className="body-strong" style={{ color: 'var(--color-ink)' }}>
+              Architecture Overview — Custom CNN with Batch Normalization & Dropout
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4">
+            {archStats.map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.08 }}
+                style={{
+                  padding: 'clamp(16px, 2vw, 24px) clamp(16px, 3vw, 32px)',
+                  borderRight: [0, 1, 2].includes(i) ? '1px solid var(--color-hairline)' : 'none',
+                  borderBottom: i < 2 ? '1px solid var(--color-hairline)' : 'none',
+                }}
+              >
+                <p className="heading-lg" style={{ color: 'var(--color-ink)', marginBottom: '2px' }}>
+                  {stat.value}
+                </p>
+                <p className="caption-md" style={{ color: 'var(--color-mute)' }}>
+                  {stat.label}
+                </p>
+              </motion.div>
             ))}
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

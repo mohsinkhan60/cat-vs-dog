@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, X, Image as ImageIcon, Loader2, Sparkles } from 'lucide-react';
+import { Upload, X, Loader2 } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
 
@@ -29,19 +29,9 @@ export default function UploadSection() {
     handleFile(e.dataTransfer.files[0]);
   }, [handleFile]);
 
-  const handleDragOver = useCallback((e) => {
-    e.preventDefault();
-    setIsDragging(true);
-  }, []);
-
-  const handleDragLeave = useCallback((e) => {
-    e.preventDefault();
-    setIsDragging(false);
-  }, []);
-
-  const handleInputChange = useCallback((e) => {
-    handleFile(e.target.files[0]);
-  }, [handleFile]);
+  const handleDragOver = useCallback((e) => { e.preventDefault(); setIsDragging(true); }, []);
+  const handleDragLeave = useCallback((e) => { e.preventDefault(); setIsDragging(false); }, []);
+  const handleInputChange = useCallback((e) => { handleFile(e.target.files[0]); }, [handleFile]);
 
   const handlePredict = async () => {
     if (!image) return;
@@ -53,10 +43,7 @@ export default function UploadSection() {
     formData.append('image', image);
 
     try {
-      const response = await fetch(`${API_URL}/predict`, {
-        method: 'POST',
-        body: formData,
-      });
+      const response = await fetch(`${API_URL}/predict`, { method: 'POST', body: formData });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Prediction failed');
       setResult(data);
@@ -75,188 +62,301 @@ export default function UploadSection() {
   };
 
   const confidencePercent = result
-    ? `${(parseFloat(result.confidence) * 100).toFixed(1)}%`
-    : '0%';
+    ? Math.round(parseFloat(result.confidence) * 100)
+    : 0;
+
+  const isCAT = result?.prediction?.toLowerCase() === 'cat';
 
   return (
-    <section id="predict" className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-50/30 dark:via-primary-900/10 to-transparent" />
-      <div className="max-w-4xl mx-auto relative">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+    <section
+      id="predict"
+      style={{
+        backgroundColor: 'var(--color-soft-cloud)',
+        paddingTop: 'var(--spacing-section)',
+        paddingBottom: 'var(--spacing-section)',
+      }}
+    >
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
+        {/* Section header */}
+        <div
+          className="hairline-bottom"
+          style={{ paddingBottom: '24px', marginBottom: '40px' }}
         >
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            <span className="gradient-text">Upload & Predict</span>
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
-            Drag & drop an image or click to browse. Our AI will identify whether it's a cat or a dog in seconds.
+          <p className="caption-md" style={{ color: 'var(--color-mute)', marginBottom: '6px' }}>
+            PetVision AI · Live Classifier
           </p>
-        </motion.div>
+          <h2 className="heading-xl" style={{ color: 'var(--color-ink)' }}>
+            Classify Your Image
+          </h2>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="glass-card rounded-3xl p-6 sm:p-10"
-        >
-          {!preview ? (
-            <div
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              className={`relative border-2 border-dashed rounded-2xl p-12 sm:p-16 text-center cursor-pointer transition-all duration-300 ${
-                isDragging
-                  ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-900/20 scale-[1.02]'
-                  : 'border-gray-300 dark:border-gray-600 hover:border-primary-400 dark:hover:border-primary-500 hover:bg-gray-50/50 dark:hover:bg-gray-800/30'
-              }`}
-            >
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleInputChange}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                aria-label="Upload image file"
-              />
-              <motion.div
-                animate={{ y: isDragging ? -5 : [0, -8, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                className="mb-6"
+        {/* Two-column layout at desktop */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+          {/* ── Left: upload / preview area ── */}
+          <div
+            className="lg:border-r"
+            style={{
+              backgroundColor: 'var(--color-canvas)',
+              borderColor: 'var(--color-hairline)',
+              padding: 'clamp(20px, 4vw, 40px)',
+            }}
+          >
+            {!preview ? (
+              <div
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                className="relative flex flex-col items-center justify-center cursor-pointer"
+                style={{
+                  border: `2px dashed ${isDragging ? 'var(--color-ink)' : 'var(--color-hairline)'}`,
+                  backgroundColor: isDragging ? 'var(--color-soft-cloud)' : 'var(--color-canvas)',
+                  minHeight: '340px',
+                  padding: '48px 32px',
+                  transition: 'border-color 0.15s ease, background-color 0.15s ease',
+                }}
               >
-                <div className="w-20 h-20 mx-auto rounded-full gradient-bg flex items-center justify-center shadow-lg shadow-primary-500/30">
-                  <Upload className="w-10 h-10 text-white" />
-                </div>
-              </motion.div>
-              <p className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                {isDragging ? 'Drop your image here' : 'Drag & drop your image'}
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">or click to browse • PNG, JPG, WEBP</p>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <div className="relative rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center min-h-[250px]">
-                <img
-                  src={preview}
-                  alt="Uploaded preview"
-                  className="max-h-[400px] w-auto object-contain mx-auto"
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleInputChange}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  aria-label="Upload image file"
                 />
-                <button
-                  onClick={reset}
-                  className="absolute top-4 right-4 w-10 h-10 bg-black/50 hover:bg-black/70 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-colors"
-                  aria-label="Remove image"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
 
-              <div className="flex justify-center">
-                <button
-                  onClick={handlePredict}
-                  disabled={loading}
-                  className="btn-primary flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                {/* Upload icon in circular ink button */}
+                <div
+                  className="flex items-center justify-center"
+                  style={{
+                    width: '64px',
+                    height: '64px',
+                    borderRadius: 'var(--radius-full)',
+                    backgroundColor: isDragging ? 'var(--color-ink)' : 'var(--color-soft-cloud)',
+                    marginBottom: '24px',
+                    transition: 'background-color 0.15s ease',
+                  }}
                 >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Analyzing...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-5 h-5" />
-                      Predict
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          )}
+                  <Upload
+                    size={24}
+                    style={{ color: isDragging ? 'var(--color-canvas)' : 'var(--color-ink)' }}
+                  />
+                </div>
 
-          <AnimatePresence>
-            {loading && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mt-8 overflow-hidden"
-              >
-                <div className="flex flex-col items-center gap-4 py-8">
+                <p className="body-strong" style={{ color: 'var(--color-ink)', textAlign: 'center' }}>
+                  {isDragging ? 'Drop your image here' : 'Drag & drop your image'}
+                </p>
+                <p className="caption-md" style={{ color: 'var(--color-mute)', marginTop: '6px', textAlign: 'center' }}>
+                  or click to browse · PNG, JPG, WEBP
+                </p>
+              </div>
+            ) : (
+              <div>
+                {/* Image preview — full-bleed on soft-cloud */}
+                <div
+                  className="relative"
+                  style={{
+                    backgroundColor: 'var(--color-soft-cloud)',
+                    aspectRatio: '1 / 1',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <img
+                    src={preview}
+                    alt="Uploaded preview"
+                    className="w-full h-full object-contain"
+                  />
+                  {/* Remove button */}
+                  <button
+                    onClick={reset}
+                    className="btn-icon-circular absolute top-3 right-3"
+                    aria-label="Remove image"
+                    style={{ backgroundColor: 'rgba(17,17,17,0.6)', color: 'var(--color-canvas)' }}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+
+                {/* Predict CTA */}
+                <div style={{ marginTop: '24px' }}>
+                  <button
+                    onClick={handlePredict}
+                    disabled={loading}
+                    className="btn-primary w-full justify-center"
+                    style={{ opacity: loading ? 0.5 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        Analyzing…
+                      </>
+                    ) : (
+                      'Predict'
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ── Right: result / instructions ── */}
+          <div
+            className="lg:border-t-0 border-t"
+            style={{
+              backgroundColor: 'var(--color-canvas)',
+              borderColor: 'var(--color-hairline)',
+              padding: 'clamp(20px, 4vw, 40px)',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <AnimatePresence mode="wait">
+              {/* Loading state */}
+              {loading && (
+                <motion.div
+                  key="loading"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex flex-col items-center justify-center h-full gap-6"
+                  style={{ minHeight: '340px' }}
+                >
                   <motion.div
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                    className="w-16 h-16 rounded-full border-4 border-primary-200 dark:border-gray-700 border-t-primary-600"
+                    transition={{ duration: 1.4, repeat: Infinity, ease: 'linear' }}
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: 'var(--radius-full)',
+                      border: '2px solid var(--color-hairline)',
+                      borderTopColor: 'var(--color-ink)',
+                    }}
                   />
-                  <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
-                    AI is analyzing your image...
+                  <p className="caption-md" style={{ color: 'var(--color-mute)' }}>
+                    AI is analyzing your image…
                   </p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                </motion.div>
+              )}
 
-          <AnimatePresence>
-            {result && (
-              <motion.div
-                initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-                className="mt-8"
-              >
-                <div className="glass-card rounded-2xl p-6 sm:p-8">
-                  <div className="flex flex-col sm:flex-row items-center gap-6">
-                    {preview && (
-                      <img
-                        src={preview}
-                        alt="Uploaded"
-                        className="w-32 h-32 rounded-xl object-cover shadow-md"
+              {/* Result */}
+              {!loading && result && (
+                <motion.div
+                  key="result"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  style={{ minHeight: '340px' }}
+                >
+                  {/* Prediction label */}
+                  <p className="caption-md" style={{ color: 'var(--color-mute)', marginBottom: '6px' }}>
+                    Prediction
+                  </p>
+
+                  <div
+                    className="display-campaign"
+                    style={{ color: 'var(--color-ink)', fontSize: 'clamp(48px, 6vw, 80px)', marginBottom: '8px' }}
+                  >
+                    {isCAT ? 'Cat' : 'Dog'}
+                  </div>
+
+                  <p className="body-md" style={{ color: 'var(--color-mute)', marginBottom: '32px' }}>
+                    {isCAT ? "It's a cat." : "It's a dog."}
+                  </p>
+
+                  {/* Confidence row */}
+                  <div style={{ marginBottom: '32px' }}>
+                    <div
+                      className="flex items-center justify-between"
+                      style={{ marginBottom: '8px' }}
+                    >
+                      <span className="caption-md" style={{ color: 'var(--color-ink)' }}>
+                        Confidence
+                      </span>
+                      <span className="body-strong" style={{ color: 'var(--color-ink)' }}>
+                        {confidencePercent}%
+                      </span>
+                    </div>
+                    <div className="confidence-bar-bg">
+                      <motion.div
+                        className="confidence-bar-fill"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${confidencePercent}%` }}
+                        transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
                       />
-                    )}
-                    <div className="flex-1 text-center sm:text-left">
-                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
-                        Prediction
-                      </p>
-                      <p className="text-3xl font-bold mb-2">
-                        {result.prediction === 'Dog' ? '🐶' : '🐱'} {result.prediction}
-                      </p>
-                      <div className="flex items-center gap-3 justify-center sm:justify-start">
-                        <div className="flex-1 max-w-[200px] h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: confidencePercent }}
-                            transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
-                            className="h-full gradient-bg rounded-full"
-                          />
-                        </div>
-                        <span className="text-sm font-bold text-primary-600 dark:text-primary-400">
-                          {confidencePercent}
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                        Confidence Score
-                      </p>
                     </div>
                   </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
-          <AnimatePresence>
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="mt-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-center"
-              >
-                <p className="text-sm text-red-600 dark:text-red-400 font-medium">{error}</p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
+                  {/* Divider */}
+                  <div className="hairline-top" style={{ paddingTop: '24px' }}>
+                    <button
+                      onClick={reset}
+                      className="btn-secondary"
+                      style={{ height: '40px', padding: '0 20px', fontSize: '14px' }}
+                    >
+                      Try Another Image
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Error */}
+              {!loading && error && (
+                <motion.div
+                  key="error"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  style={{ minHeight: '340px' }}
+                >
+                  <p className="caption-md" style={{ color: 'var(--color-mute)', marginBottom: '8px' }}>
+                    Error
+                  </p>
+                  <p className="body-strong" style={{ color: 'var(--color-sale)' }}>
+                    {error}
+                  </p>
+                  <button
+                    onClick={reset}
+                    className="btn-secondary"
+                    style={{ marginTop: '24px', height: '40px', padding: '0 20px', fontSize: '14px' }}
+                  >
+                    Try Again
+                  </button>
+                </motion.div>
+              )}
+
+              {/* Default empty state */}
+              {!loading && !result && !error && (
+                <motion.div
+                  key="empty"
+                  className="flex flex-col justify-center"
+                  style={{ minHeight: '340px' }}
+                >
+                  <p className="caption-md" style={{ color: 'var(--color-mute)', marginBottom: '16px' }}>
+                    How it works
+                  </p>
+                  {[
+                    { num: '01', text: 'Upload a cat or dog photo using the panel on the left.' },
+                    { num: '02', text: 'PetVision AI preprocesses the image — RGB conversion, 256×256 resize, pixel normalization — then runs it through the CNN.' },
+                    { num: '03', text: 'Get the classification and confidence score. End-to-end response in under 200ms.' },
+                  ].map((step) => (
+                    <div
+                      key={step.num}
+                      className="flex items-start gap-5 hairline-bottom"
+                      style={{ padding: '18px 0' }}
+                    >
+                      <span
+                        className="body-strong"
+                        style={{ color: 'var(--color-hairline)', flexShrink: 0, width: '28px' }}
+                      >
+                        {step.num}
+                      </span>
+                      <p className="body-md" style={{ color: 'var(--color-charcoal)' }}>
+                        {step.text}
+                      </p>
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
       </div>
     </section>
   );

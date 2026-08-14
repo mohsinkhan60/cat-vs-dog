@@ -1,77 +1,106 @@
 import { motion } from 'framer-motion';
-import { Zap, MonitorSmartphone, Brain, Shield, Gauge, RefreshCw } from 'lucide-react';
+import { Layers, Zap, Server, Shield, Globe, RefreshCw } from 'lucide-react';
 
 const features = [
   {
+    icon: Layers,
+    title: '4-Layer Custom CNN',
+    description:
+      'Progressive feature maps (32→64→128→256 filters) with batch normalization and dropout regularization layers — 431,553 parameters optimized for binary classification.',
+  },
+  {
     icon: Zap,
-    title: 'Lightning Fast',
-    description: 'Get predictions in under 2 seconds with our optimized deep learning model.',
+    title: 'Sub-100ms Inference',
+    description:
+      'Model converted to TensorFlow Lite (1.65MB) for fast inference. Under 200ms end-to-end response time from upload to result on Vercel.',
   },
   {
-    icon: MonitorSmartphone,
-    title: 'Responsive Design',
-    description: 'Seamless experience across desktop, tablet, and mobile devices.',
-  },
-  {
-    icon: Brain,
-    title: 'AI Powered',
-    description: 'State-of-the-art convolutional neural network trained on 25K+ images.',
+    icon: Server,
+    title: 'Flask REST API',
+    description:
+      'RESTful Flask backend with image preprocessing pipeline (RGB conversion, 256×256 resizing, pixel normalization), CORS configuration, and Gunicorn WSGI server.',
   },
   {
     icon: Shield,
-    title: 'Secure Uploads',
-    description: 'Images are processed in memory and never stored on our servers.',
+    title: 'Zero Data Retention',
+    description:
+      'Images are processed entirely in-memory and never written to disk or logged. No user data is stored at any point in the pipeline.',
   },
   {
-    icon: Gauge,
-    title: 'Real-time Results',
-    description: 'Instant feedback with confidence scores displayed immediately.',
+    icon: Globe,
+    title: 'React 19 + Vite Frontend',
+    description:
+      'Built with React 19, Vite, and TailwindCSS 4. Deployed on Vercel with global CDN distribution and optimized asset bundling.',
   },
   {
     icon: RefreshCw,
-    title: 'High Accuracy',
-    description: 'Consistent 95%+ accuracy across diverse image conditions and breeds.',
+    title: 'Complete ML Workflow',
+    description:
+      'Full pipeline from data collection and model training on 25,000+ Kaggle images through to cloud deployment — implementing the complete ML production lifecycle.',
   },
 ];
 
 export default function FeaturesSection() {
   return (
-    <section id="features" className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-pink-50/30 dark:via-pink-900/10 to-transparent" />
-      <div className="max-w-6xl mx-auto relative">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+    <section
+      id="features"
+      style={{
+        backgroundColor: 'var(--color-canvas)',
+        paddingTop: 'var(--spacing-section)',
+        paddingBottom: 'var(--spacing-section)',
+      }}
+    >
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
+        {/* Section header */}
+        <div
+          className="hairline-bottom"
+          style={{ paddingBottom: '24px', marginBottom: '0' }}
         >
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            <span className="gradient-text">Why Choose Us</span>
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
-            Built with cutting-edge technology to deliver the best classification experience.
+          <p className="caption-md" style={{ color: 'var(--color-mute)', marginBottom: '6px' }}>
+            Tech Stack
           </p>
-        </motion.div>
+          <h2 className="heading-xl" style={{ color: 'var(--color-ink)' }}>
+            Built For Production
+          </h2>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* 3-column feature grid — category-icon-card style */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" style={{ borderTop: '1px solid var(--color-hairline)' }}>
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              whileHover={{ y: -8, transition: { duration: 0.3 } }}
-              className="glass-card rounded-2xl p-6 group cursor-default"
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.45, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              className="p-6 md:p-8 border-b"
+              style={{
+                backgroundColor: 'var(--color-canvas)',
+                borderColor: 'var(--color-hairline)',
+                borderRight:
+                  index % 3 !== 2 ? '1px solid var(--color-hairline)' : 'none',
+              }}
             >
-              <div className="w-14 h-14 rounded-2xl gradient-bg flex items-center justify-center mb-5 shadow-lg shadow-primary-500/20 group-hover:shadow-xl group-hover:shadow-primary-500/30 transition-shadow">
-                <feature.icon className="w-7 h-7 text-white" />
+              {/* Icon on soft-cloud circle */}
+              <div
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: 'var(--radius-full)',
+                  backgroundColor: 'var(--color-soft-cloud)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '20px',
+                }}
+              >
+                <feature.icon size={20} style={{ color: 'var(--color-ink)' }} />
               </div>
-              <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-2">
+
+              <h3 className="heading-md" style={{ color: 'var(--color-ink)', marginBottom: '8px' }}>
                 {feature.title}
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+              <p className="body-md" style={{ color: 'var(--color-mute)' }}>
                 {feature.description}
               </p>
             </motion.div>

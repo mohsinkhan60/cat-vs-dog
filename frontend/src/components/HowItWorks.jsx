@@ -3,73 +3,94 @@ import { Upload, ScanLine, CheckCircle2 } from 'lucide-react';
 
 const steps = [
   {
+    num: '01',
     icon: Upload,
     title: 'Upload Image',
-    description: 'Drag & drop or select a cat or dog photo from your device.',
+    description:
+      'Drag & drop or select any cat or dog photo. PNG, JPG, and WEBP supported. Images are never stored — processed entirely in-memory.',
   },
   {
+    num: '02',
     icon: ScanLine,
-    title: 'AI Processing',
-    description: 'Our neural network analyzes patterns, features, and textures.',
+    title: 'CNN Inference',
+    description:
+      'The image is preprocessed (RGB conversion, 256×256 resize, pixel normalization) then passed through a 4-layer CNN with 32→64→128→256 progressive feature maps and GlobalAveragePooling.',
   },
   {
+    num: '03',
     icon: CheckCircle2,
-    title: 'Get Prediction',
-    description: 'Receive instant classification with confidence score.',
+    title: 'Instant Result',
+    description:
+      'The TFLite model (1.65MB) returns a classification with confidence score. Sub-100ms inference, under 200ms end-to-end via the Flask + Gunicorn REST API.',
   },
 ];
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-50/30 dark:via-purple-900/10 to-transparent" />
-      <div className="max-w-5xl mx-auto relative">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+    <section
+      id="how-it-works"
+      style={{
+        backgroundColor: 'var(--color-canvas)',
+        paddingTop: 'var(--spacing-section)',
+        paddingBottom: 'var(--spacing-section)',
+      }}
+    >
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
+        {/* Section header */}
+        <div
+          className="hairline-bottom"
+          style={{ paddingBottom: '24px', marginBottom: '0' }}
         >
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            <span className="gradient-text">How It Works</span>
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
-            Three simple steps to classify any cat or dog image with AI precision.
+          <p className="caption-md" style={{ color: 'var(--color-mute)', marginBottom: '6px' }}>
+            Process
           </p>
-        </motion.div>
+          <h2 className="heading-xl" style={{ color: 'var(--color-ink)' }}>
+            How It Works
+          </h2>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-          <div className="hidden md:block absolute top-16 left-[calc(16.67%+16px)] right-[calc(16.67%+16px)] h-0.5">
-            <motion.div
-              initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1, delay: 0.5 }}
-              className="h-full bg-gradient-to-r from-primary-400 via-accent-purple to-accent-pink opacity-40 origin-left"
-            />
-          </div>
-
+        {/* Steps grid — 3 columns, hairline-divided */}
+        <div className="grid grid-cols-1 md:grid-cols-3" style={{ borderTop: '1px solid var(--color-hairline)' }}>
           {steps.map((step, index) => (
             <motion.div
-              key={step.title}
-              initial={{ opacity: 0, y: 30 }}
+              key={step.num}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.5, delay: index * 0.2 }}
-              className="relative flex flex-col items-center text-center"
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.5, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] }}
+              className={`p-6 md:p-8 ${index < 2 ? 'md:border-r' : ''} border-b md:border-b-0`}
+              style={{ borderColor: 'var(--color-hairline)' }}
             >
-              <motion.div
-                whileHover={{ scale: 1.1, y: -5 }}
-                className="relative z-10 w-20 h-20 rounded-full gradient-bg flex items-center justify-center shadow-lg shadow-primary-500/30 mb-6"
+              {/* Step number */}
+              <p
+                className="body-strong"
+                style={{ color: 'var(--color-hairline)', marginBottom: '24px' }}
               >
-                <step.icon className="w-9 h-9 text-white" />
-                <div className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-white dark:bg-gray-900 text-sm font-bold flex items-center justify-center shadow-md text-primary-600 dark:text-primary-400">
-                  {index + 1}
-                </div>
-              </motion.div>
-              <h3 className="text-xl font-bold mb-3 text-gray-800 dark:text-gray-100">{step.title}</h3>
-              <p className="text-gray-600 dark:text-gray-400 max-w-sm leading-relaxed">{step.description}</p>
+                {step.num}
+              </p>
+
+              {/* Icon in soft-cloud circle */}
+              <div
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: 'var(--radius-full)',
+                  backgroundColor: 'var(--color-soft-cloud)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '20px',
+                }}
+              >
+                <step.icon size={20} style={{ color: 'var(--color-ink)' }} />
+              </div>
+
+              <h3 className="heading-md" style={{ color: 'var(--color-ink)', marginBottom: '10px' }}>
+                {step.title}
+              </h3>
+              <p className="body-md" style={{ color: 'var(--color-mute)' }}>
+                {step.description}
+              </p>
             </motion.div>
           ))}
         </div>

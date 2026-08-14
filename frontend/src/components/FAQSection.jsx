@@ -1,107 +1,118 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, HelpCircle } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 const faqs = [
   {
-    question: 'How accurate is the AI classifier?',
+    question: 'What validation accuracy does PetVision AI achieve?',
     answer:
-      'Our model achieves approximately 95% accuracy on the standard Cats vs Dogs test dataset. The confidence score reflects the model\'s certainty for each prediction.',
+      '77% validation accuracy on the 25,000-image Kaggle Cats vs Dogs dataset. The model uses a custom 4-layer CNN with 431,553 parameters, batch normalization, and dropout regularization layers specifically optimized for binary image classification.',
   },
   {
-    question: 'What image formats are supported?',
+    question: 'How is the model architecture structured?',
     answer:
-      'We support all common image formats including PNG, JPG, JPEG, and WEBP. Images are resized to 256x256 pixels for optimal processing.',
+      'PetVision AI uses a custom convolutional neural network with progressive feature maps — 32→64→128→256 filters — across 4 convolutional layers, followed by GlobalAveragePooling. Batch normalization is applied after each conv block and dropout regularization prevents overfitting during the 25-epoch training run.',
   },
   {
-    question: 'Is my image stored on your servers?',
+    question: 'How fast is the inference?',
     answer:
-      'No. Images are processed in-memory solely for prediction and are never stored or logged. Your privacy is fully protected.',
+      'Sub-100ms inference time. The model is exported to TensorFlow Lite format (1.65MB) which enables fast, lightweight inference. End-to-end response time — from image upload to result returned — is under 200ms.',
   },
   {
-    question: 'How does the AI work under the hood?',
+    question: 'What image preprocessing does the API apply?',
     answer:
-      'We use a deep convolutional neural network (CNN) trained on 25,000+ labeled images. The model learns visual patterns, textures, and features that distinguish cats from dogs.',
+      'The Flask REST API applies a standard preprocessing pipeline: RGB conversion, resizing to 256×256 pixels, and pixel normalization (scaling values to [0, 1]). This matches the preprocessing applied during training to ensure consistent inference results.',
   },
   {
-    question: 'Can I use this API for my own projects?',
+    question: 'Is my image stored or logged?',
     answer:
-      'Yes! The Flask backend exposes a simple POST /predict endpoint. Send a multipart form with an image file and receive a JSON response.',
+      'No. Images are processed entirely in-memory for the duration of the prediction request and are never written to disk, logged, or retained in any form. The API is stateless — each request is independent.',
   },
   {
-    question: 'Does it work on mobile devices?',
+    question: 'How can I call the API directly?',
     answer:
-      'Absolutely. The entire application is responsive and works perfectly on phones, tablets, and desktops of all sizes.',
+      'The Flask backend exposes a POST /predict endpoint. Send a multipart/form-data request with an image field containing the image file. The response is JSON with prediction (\"Cat\" or \"Dog\") and confidence (float 0–1). The Gunicorn WSGI server handles production traffic.',
   },
 ];
 
 export default function FAQSection() {
   const [openIndex, setOpenIndex] = useState(null);
 
-  const toggle = (index) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
+  const toggle = (index) => setOpenIndex(openIndex === index ? null : index);
 
   return (
-    <section id="faq" className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-yellow-50/30 dark:via-yellow-900/10 to-transparent" />
-      <div className="max-w-3xl mx-auto relative">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+    <section
+      id="faq"
+      style={{
+        backgroundColor: 'var(--color-soft-cloud)',
+        paddingTop: 'var(--spacing-section)',
+        paddingBottom: 'var(--spacing-section)',
+      }}
+    >
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
+        {/* Section header */}
+        <div
+          className="hairline-bottom"
+          style={{ paddingBottom: '24px', marginBottom: '0' }}
         >
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            <span className="gradient-text">Frequently Asked Questions</span>
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 text-lg">
-            Everything you need to know about our AI classifier.
+          <p className="caption-md" style={{ color: 'var(--color-mute)', marginBottom: '6px' }}>
+            FAQ
           </p>
-        </motion.div>
+          <h2 className="heading-xl" style={{ color: 'var(--color-ink)' }}>
+            Frequently Asked Questions
+          </h2>
+        </div>
 
-        <div className="space-y-4">
+        {/* FAQ rows — faq-row accordion pattern */}
+        <div style={{ backgroundColor: 'var(--color-canvas)' }}>
           {faqs.map((faq, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.4, delay: index * 0.08 }}
-              className="glass-card rounded-2xl overflow-hidden"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.4, delay: index * 0.06 }}
+              className="hairline-bottom"
             >
               <button
                 onClick={() => toggle(index)}
-                className="w-full flex items-center justify-between p-5 sm:p-6 text-left hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors"
+                className="w-full flex items-center justify-between text-left"
+                style={{ padding: 'clamp(16px, 3vw, 24px) clamp(16px, 4vw, 32px)', background: 'none', border: 'none', cursor: 'pointer' }}
                 aria-expanded={openIndex === index}
+                aria-controls={`faq-answer-${index}`}
               >
-                <span className="flex items-center gap-3">
-                  <HelpCircle className="w-5 h-5 text-primary-500 flex-shrink-0" />
-                  <span className="font-semibold text-gray-800 dark:text-gray-100">{faq.question}</span>
+                <span className="heading-md" style={{ color: 'var(--color-ink)', flex: 1, marginRight: '24px' }}>
+                  {faq.question}
                 </span>
-                <motion.div
+                <motion.span
                   animate={{ rotate: openIndex === index ? 180 : 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex-shrink-0 text-gray-400"
+                  transition={{ duration: 0.25 }}
+                  style={{ flexShrink: 0, color: 'var(--color-ink)', display: 'flex' }}
                 >
-                  <ChevronDown className="w-5 h-5" />
-                </motion.div>
+                  <ChevronDown size={20} />
+                </motion.span>
               </button>
+
               <AnimatePresence>
                 {openIndex === index && (
                   <motion.div
+                    id={`faq-answer-${index}`}
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3, ease: 'easeInOut' }}
-                    className="overflow-hidden"
+                    transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                    style={{ overflow: 'hidden' }}
                   >
-                    <div className="px-5 sm:px-6 pb-5 sm:pb-6 pl-14 sm:pl-14">
-                      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                        {faq.answer}
-                      </p>
-                    </div>
+                    <p
+                      className="body-md"
+                      style={{
+                        color: 'var(--color-charcoal)',
+                        padding: '0 clamp(16px, 4vw, 32px) clamp(16px, 2vw, 24px)',
+                        maxWidth: '720px',
+                      }}
+                    >
+                      {faq.answer}
+                    </p>
                   </motion.div>
                 )}
               </AnimatePresence>
